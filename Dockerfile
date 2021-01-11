@@ -18,6 +18,15 @@ RUN apt-get update \
     && useradd -m github \
     && usermod -aG sudo github \
     && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    
+# Install Docker client
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
+    && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable" \
+    && apt-get update \
+    && apt-get install docker-ce-cli \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd -m github
 
 USER github
 WORKDIR /home/github
