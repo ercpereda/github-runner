@@ -1,0 +1,32 @@
+version: '3'
+services:
+  docker:
+    image: docker:dind
+    container_name: docker
+    privileged: yes
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+    volumes:
+      - certs-client:/certs/client
+        # - docker-storage:/var/lib/docker
+      - github-workdir:/home/github/_work
+
+  github-runner:
+    image: github-runner:1.0.0
+    container_name: github-runner
+    env_file: .env
+    environment:
+      GITHUB_OWNER: ercpereda
+      GITHUB_REPOSITORY: helm-charts
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_TLS_VERIFY: '1'
+      DOCKER_TLS_CERTDIR: /certs
+      DOCKER_CERT_PATH: /certs/client
+    volumes:
+      - certs-client:/certs/client
+      - github-workdir:/home/github/_work
+
+volumes:
+  certs-client:
+  github-workdir:
+  # docker-storage:

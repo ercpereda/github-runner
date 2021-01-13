@@ -8,16 +8,16 @@ ENV RUNNER_LABELS ""
 
 RUN apt-get update \
     && apt-get install -y \
+        apt-transport-https \
+        ca-certificates \
+        gnupg-agent \
+        software-properties-common \
         curl \
         sudo \
         git \
         jq \
-        iputils-ping \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && useradd -m github \
-    && usermod -aG sudo github \
-    && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+        git \
+        iputils-ping
     
 # Install Docker client
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
@@ -25,8 +25,12 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
     && apt-get update \
     && apt-get install docker-ce-cli \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && useradd -m github
+    && rm -rf /var/lib/apt/lists/*
+
+
+RUN useradd -m github \
+    && usermod -aG sudo github \
+    && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER github
 WORKDIR /home/github
@@ -37,5 +41,8 @@ RUN GITHUB_RUNNER_VERSION=$(curl --silent "https://api.github.com/repos/actions/
 
 COPY --chown=github:github entrypoint.sh runsvc.sh ./
 RUN sudo chmod u+x ./entrypoint.sh ./runsvc.sh
+
+RUN mkdir $RUNNER_WORKDIR \
+    && chown github:github $RUNNER_WORKDIR
 
 ENTRYPOINT ["/home/github/entrypoint.sh"]

@@ -7,7 +7,7 @@ else
     registration_url="${registration_url}/${GITHUB_REPOSITORY}"
 fi
 
-echo "Requesting token at '${token_url}'"
+echo ">>>> Requesting token at '${token_url}'"
 
 payload=$(curl -sX POST -H "Authorization: token ${GITHUB_PAT}" ${token_url})
 export RUNNER_TOKEN=$(echo $payload | jq .token --raw-output)
@@ -30,6 +30,8 @@ remove() {
     export REMOVE_TOKEN=$(echo $payload | jq .token --raw-output)
 
     ./config.sh remove --unattended --token "${REMOVE_TOKEN}"
+
+    sudo rm -rf $RUNNER_WORKDIR/*
 }
 
 trap 'remove; exit 130' INT
