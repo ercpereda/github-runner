@@ -5,7 +5,7 @@ metadata:
   labels:
     app: github-runner
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: github-runner
@@ -15,15 +15,44 @@ spec:
         app: github-runner
     spec:
       containers:
+      - name: docker
+        image: docker:19.03.12-dind
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: docker-certs
+            mountPath: /certs
+          - name: github-workdir
+            mountPath: /home/github/_work
+
       - name: github-runner
-        image: sanderknape/github-runner:latest
+        image: ercpereda/github-runner:1.0.0
         env:
+        - name: DOCKER_HOST
+          value: tcp://localhost:2376
+        - name: DOCKER_TLS_VERIFY
+          value: "1"
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+        - name: DOCKER_CERT_PATH
+          value: /certs/client
         - name: GITHUB_OWNER
-          value: your-organization
+          value: ercpereda
         - name: GITHUB_REPOSITORY
-          value: your-repository
-        - name: GITHUB_PAT # stored separately in a Kubernetes secret
+          value: helm-charts
+        - name: GITHUB_PAT
           valueFrom:
             secretKeyRef:
-              name: my-secret
+              name: pat-secret
               key: pat
+        volumeMounts:
+        - name: docker-certs
+          mountPath: /certs
+        - name: github-workdir
+          mountPath: /home/github/_work
+
+      volumes:
+      - name: docker-certs
+        emptyDir: {}
+      - name: github-workdir
+        emptyDir: {}

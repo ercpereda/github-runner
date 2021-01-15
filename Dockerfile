@@ -5,6 +5,8 @@ ENV GITHUB_OWNER ""
 ENV GITHUB_REPOSITORY ""
 ENV RUNNER_WORKDIR "_work"
 ENV RUNNER_LABELS ""
+ENV GITHUB_APP_ID "" 
+ENV GITHUB_APP_PK "" 
 
 RUN apt-get update \
     && apt-get install -y \
@@ -39,8 +41,8 @@ RUN GITHUB_RUNNER_VERSION=$(curl --silent "https://api.github.com/repos/actions/
     && curl -Ls https://github.com/actions/runner/releases/download/v${GITHUB_RUNNER_VERSION}/actions-runner-linux-x64-${GITHUB_RUNNER_VERSION}.tar.gz | tar xz \
     && sudo ./bin/installdependencies.sh
 
-COPY --chown=github:github entrypoint.sh runsvc.sh ./
-RUN sudo chmod u+x ./entrypoint.sh ./runsvc.sh
+COPY --chown=github:github entrypoint.sh runsvc.sh jwt.sh ./
+RUN sudo chmod u+x ./entrypoint.sh ./runsvc.sh ./jwt.sh
 
 RUN mkdir $RUNNER_WORKDIR \
     && chown github:github $RUNNER_WORKDIR

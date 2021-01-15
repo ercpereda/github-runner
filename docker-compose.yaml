@@ -16,8 +16,8 @@ services:
     container_name: github-runner
     env_file: .env
     environment:
-      GITHUB_OWNER: ercpereda
-      GITHUB_REPOSITORY: helm-charts
+      GITHUB_OWNER: ErTestOrg
+      GITHUB_APP_ID: "95241"
       DOCKER_HOST: tcp://docker:2376
       DOCKER_TLS_VERIFY: '1'
       DOCKER_TLS_CERTDIR: /certs
